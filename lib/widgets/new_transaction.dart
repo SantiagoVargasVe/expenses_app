@@ -1,28 +1,29 @@
 import 'package:flutter/material.dart';
 
-class NewTransaction extends StatelessWidget {
-  final titleController = TextEditingController();
-  final amountController = TextEditingController();
-
+class NewTransaction extends StatefulWidget {
   final Function addTx;
 
-  NewTransaction(this.addTx, {Key? key}) : super(key: key);
+  const NewTransaction(this.addTx, {Key? key}) : super(key: key);
 
-  void submitData(BuildContext context) {
-    const snackBar = SnackBar(content: Text('Invalid Input'));
-    try {
-      final enteredTitle = titleController.text;
-      final enteredAmount = int.parse(amountController.text);
+  @override
+  State<NewTransaction> createState() => _NewTransactionState();
+}
 
-      if (enteredTitle.isEmpty || enteredAmount <= 0) {
-        ScaffoldMessenger.of(context).showSnackBar(snackBar);
-        return;
-      }
+class _NewTransactionState extends State<NewTransaction> {
+  final titleController = TextEditingController();
 
-      addTx(enteredTitle, enteredAmount);
-    } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(snackBar);
+  final amountController = TextEditingController();
+
+  void submitData() {
+    final enteredTitle = titleController.text;
+    final enteredAmount = int.parse(amountController.text);
+
+    if (enteredTitle.isEmpty || enteredAmount <= 0) {
+      return;
     }
+
+    widget.addTx(enteredTitle, enteredAmount);
+    Navigator.of(context).pop();
   }
 
   @override
@@ -46,11 +47,11 @@ class NewTransaction extends StatelessWidget {
             controller: amountController,
             keyboardType: TextInputType.number,
             onSubmitted: (_) {
-              submitData(context);
+              submitData();
             },
           ),
           TextButton(
-              onPressed: () => submitData(context),
+              onPressed: () => submitData(),
               style: TextButton.styleFrom(primary: Colors.purple),
               child: const Text('Add Transaction'))
         ]),
