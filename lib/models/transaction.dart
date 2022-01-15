@@ -1,7 +1,7 @@
 class Transaction {
   String id;
   String title;
-  int amount;
+  double amount;
   DateTime date;
 
   Transaction(

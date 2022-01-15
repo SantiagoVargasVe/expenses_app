@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'widgets/transaction_list.dart';
 import 'models/transaction.dart';
+import 'widgets/chart.dart';
 
 void main() {
   initializeDateFormatting('es_ES').then((_) => runApp(MyApp()));
@@ -46,16 +47,23 @@ class _MyHomePageState extends State<MyHomePage> {
   final amountController = TextEditingController();
 
   final List<Transaction> _userTransactions = [
-    // Transaction(
-    //     id: 't1', title: 'Shoes', amount: 2312, date: DateTime(2019, 4, 1)),
-    // Transaction(
-    //     id: 't2',
-    //     title: 'Weekly groceries',
-    //     amount: 2312,
-    //     date: DateTime.now()),
+    Transaction(
+        id: 't1', title: 'Shoes', amount: 2312, date: DateTime(2022, 1, 11)),
+    Transaction(
+        id: 't2', title: 'Weekly groceries', amount: 232, date: DateTime.now()),
   ];
 
-  void _addNewTransaction(String txTitle, int txAmount) {
+  List<Transaction> get _recentTransactions {
+    return _userTransactions.where((tx) {
+      return tx.date.isAfter(
+        DateTime.now().subtract(
+          const Duration(days: 7),
+        ),
+      );
+    }).toList();
+  }
+
+  void _addNewTransaction(String txTitle, double txAmount) {
     final newTx = Transaction(
       title: txTitle,
       amount: txAmount,
@@ -90,15 +98,7 @@ class _MyHomePageState extends State<MyHomePage> {
       body: SingleChildScrollView(
         child: Column(
           children: [
-            const SizedBox(
-              width: double.infinity,
-              child: Card(
-                child: Text(
-                  "CHART",
-                  textAlign: TextAlign.center,
-                ),
-              ),
-            ),
+            Chart(_recentTransactions),
             TransactionList(_userTransactions),
           ],
         ),

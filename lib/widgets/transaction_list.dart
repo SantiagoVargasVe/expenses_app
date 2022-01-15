@@ -16,7 +16,7 @@ class TransactionList extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Text(
-                  'No transactions added yet!',
+                  'No hay transacciones por ahora',
                   style: Theme.of(context).textTheme.headline6,
                 ),
                 const SizedBox(
