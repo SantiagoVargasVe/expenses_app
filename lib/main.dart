@@ -1,5 +1,6 @@
 import 'widgets/new_transaction.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'widgets/transaction_list.dart';
 import 'models/transaction.dart';
@@ -44,11 +45,21 @@ class _MyHomePageState extends State<MyHomePage> {
   // var titleInput = '';
   final titleController = TextEditingController();
 
+  bool _showChart = false;
+
   final amountController = TextEditingController();
 
   final List<Transaction> _userTransactions = [
     Transaction(
-        id: 't1', title: 'Shoes', amount: 2312, date: DateTime(2022, 1, 11)),
+        id: 't1', title: 'Shoes', amount: 2312, date: DateTime(2022, 1, 15)),
+    Transaction(
+        id: 't2', title: 'Weekly groceries', amount: 232, date: DateTime.now()),
+    Transaction(
+        id: 't1', title: 'Shoes', amount: 2312, date: DateTime(2022, 1, 17)),
+    Transaction(
+        id: 't2', title: 'Weekly groceries', amount: 232, date: DateTime.now()),
+    Transaction(
+        id: 't1', title: 'Shoes', amount: 2312, date: DateTime(2022, 1, 13)),
     Transaction(
         id: 't2', title: 'Weekly groceries', amount: 232, date: DateTime.now()),
   ];
@@ -93,22 +104,61 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   Widget build(BuildContext context) {
+    final mediaQuery = MediaQuery.of(context);
+    final isLandscape = mediaQuery.orientation == Orientation.landscape;
+
+    final appBar = AppBar(
+      title: const Text('Finanzas personales'),
+      actions: [
+        IconButton(
+            icon: const Icon(Icons.add_rounded),
+            onPressed: () => _startAddNewTransaction(context)),
+      ],
+    );
+
+    final txListWidget = SizedBox(
+        height: (mediaQuery.size.height -
+                appBar.preferredSize.height -
+                mediaQuery.padding.top) *
+            0.7,
+        child: TransactionList(_userTransactions, _deleteTransaction));
+
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Finanzas personales'),
-        actions: [
-          IconButton(
-              icon: const Icon(Icons.add_rounded),
-              onPressed: () => _startAddNewTransaction(context)),
+      appBar: appBar,
+      body: Column(
+        children: [
+          if (isLandscape)
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const Text('Mostrar grafica'),
+                Switch(
+                    value: _showChart,
+                    onChanged: (val) {
+                      setState(() {
+                        _showChart = val;
+                      });
+                    })
+              ],
+            ),
+          if (!isLandscape)
+            SizedBox(
+                height: (mediaQuery.size.height -
+                        appBar.preferredSize.height -
+                        mediaQuery.padding.top) *
+                    0.3,
+                child: Chart(_recentTransactions)),
+          if (!isLandscape) txListWidget,
+          if (isLandscape)
+            _showChart
+                ? SizedBox(
+                    height: (mediaQuery.size.height -
+                            appBar.preferredSize.height -
+                            mediaQuery.padding.top) *
+                        0.7,
+                    child: Chart(_recentTransactions))
+                : txListWidget,
         ],
-      ),
-      body: SingleChildScrollView(
-        child: Column(
-          children: [
-            Chart(_recentTransactions),
-            TransactionList(_userTransactions, _deleteTransaction),
-          ],
-        ),
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
       floatingActionButton: FloatingActionButton(
